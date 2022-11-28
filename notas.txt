@@ -24,12 +24,16 @@ git config ... #configuraciones
     git commit -m "Comentario sobre el archivo" #comprometer lo que esté en el stage 
     git commit #forma alternativa de comprometer
     git rm #mando directamente al stage la acción de borrado
-    git log --oneline #revisar los commit que he realizado
+    git log --oneline #historial de commits
     git branch #Ver en que rama me encuentro
     git checkout -b "nombre" #crear una rama
     cat "nombre del archivo" #ver el contenido del archivo en la rama en la que estoy
     
 
+#subir a github
 
-
+    #repositorio se refiere al sitio en github
+    git remote add origin "url del repositorio" #asignar repositorio al que me voy a Conectar
+    git push -u origin "nombre de la rama" #crear rama dentro del repositorio en github
+    git push #subir cualquier cambio que haya hecho a mi repositorio en github
 
