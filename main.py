@@ -8,10 +8,9 @@ with open('Est_escaleras.json', 'r') as f:
 print(data["tramos"])
 
 
-
+num_pel="contar numero de peldanos del diccionario"
 es_lo="espesor de losa"
 h="altura piso"
-num_pel="contar numero de peldanos del diccionario"
 ch=(h/num_pel)
 hh="contrahuella obtenida de coordenadas del diccionario"
 
@@ -36,6 +35,7 @@ while npel==False:
     print("Debe haber al menos 1 peldaño por tramo")
 
   elif n_pel=="1":
+  
     npel=True
 
   else: npel=True
@@ -57,11 +57,31 @@ if descanso==True:
   
 nt=tramos
 
-tram=0
-def c_tram(tram,nt):
-  if tram % 2 == 0:
-    
-  else:
-    x_in=0
-    y_in=0
-    
+#aqui lo que intentare sera que me cree las coordenadas de cada vertice en una vista frontal de las escaleras en diccionarios
+for i in range(tramos):
+  tram=0
+  x_in=0
+  z_in=0
+  def c_tram(tram,x_in,z_in):
+    if tram % 2 == 0:
+      x=x_in
+      z=z_in
+      for i in range(n_pel):
+        "peldano (i+(tram*n_pel))"=[ #aqui quiero hacer que el numero del peldano aumente +1 pero aun no se como xd
+          [x,z],
+          [x,z+ch]
+        ] 
+        x=x+hh
+        z=z+ch
+
+    else:
+      x=x_in+(hh*n_pel)
+      z=z_in+(h/2)
+      for i in range(n_pel):
+        "peldano (i+(tram*n_pel))"=[ #aqui lo mismo
+          [x,z],
+          [x,z+ch]
+        ]
+        x=x-hh
+        z=z+ch
+  tram=tram+1
