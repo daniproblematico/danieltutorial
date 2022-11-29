@@ -1,6 +1,6 @@
  {   "generales":{
         "espesor_losa": 0.15,
-        "altura_piso": 1.50,
+        "altura_piso": 3.0,
         "descanso_con_peldanos": false
     },
     "tramos": {
