@@ -2,17 +2,29 @@ import json
 
 with open('Est_escaleras.json', 'r') as f:
   data = json.load(f)
-
-
-
 print(data["tramos"])
 
+ep=data["generales"]
+num_tram=len(data["tramos"])
+print("Numero de tramos = ",num_tram)
 
-num_pel="contar numero de peldanos del diccionario"
-es_lo="espesor de losa"
-h="altura piso"
+tr=data["tramos"]
+ap=tr["0"]
+num_pel=(len(ap["peldanos"]))
+print("Numero de peldanos por tramos = ",num_pel)
+
+es_lo=ep["espesor_losa"]
+print("Espesor de losa es = ",es_lo)
+
+h=ep["altura_piso"]
+print("Altura de piso es = ",h)
+
 ch=(h/num_pel)
+print("Contrahuella es = ", ch)
+
 hh="contrahuella obtenida de coordenadas del diccionario"
+print("Huella es = ",hh)
+
 
 tr=False #Si se ingreso un numero adecuado de tramos
 descanso=True #Si hay descanso o no (Asumo que si es una escalera de un solo tramo, no hay descanso)
