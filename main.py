@@ -1,99 +1,99 @@
 import json
 
+
+
 with open('Est_escaleras.json', 'r') as f:
   data = json.load(f)
-print(data["tramos"])
 
-ep=data["generales"]
+l_desc=(data["tramos"]["0"]["descanso"]["vertices"][1][0])-(data["tramos"]["0"]["descanso"]["vertices"][0][0])
+print ("Longitud del descanso es= ",l_desc)
+
 num_tram=len(data["tramos"])
 print("Numero de tramos = ",num_tram)
 
-tr=data["tramos"]
-ap=tr["0"]
-num_pel=(len(ap["peldanos"]))
+
+num_pel=(len(data["tramos"]["0"]["peldanos"]))
 print("Numero de peldanos por tramos = ",num_pel)
 
-es_lo=ep["espesor_losa"]
+es_lo=data["generales"]["espesor_losa"]
 print("Espesor de losa es = ",es_lo)
 
-h=ep["altura_piso"]
+h=data["generales"]["altura_piso"]
 print("Altura de piso es = ",h)
 
-ch=(h/num_pel)
+ch=(h/(2*num_pel))
 print("Contrahuella es = ", ch)
 
-hh="contrahuella obtenida de coordenadas del diccionario"
+hh=(data["tramos"]["0"]["peldanos"]["0"]["vertices"][1][0])-(data["tramos"]["0"]["peldanos"]["0"]["vertices"][0][0])
 print("Huella es = ",hh)
 
 
-tr=False #Si se ingreso un numero adecuado de tramos
+
 descanso=True #Si hay descanso o no (Asumo que si es una escalera de un solo tramo, no hay descanso)
 
-while tr==False: 
-  tramos=input("numero de tramos = ",)
-  if tramos=="0":
-    print("Debe haber al menos 1 tramo")
+if num_tram==1: descanso=False
 
-  elif tramos=="1":
-    descanso=False
-    tr=True
+des_pel=True
+if (data["generales"]["descanso_con_peldanos"])==False:
+  des_pel=False
+print("¿Hay peldano en el descanso?",des_pel)
 
-  else: tr=True
-
-npel=False  #Si se ingreso un numero adedcuado de peldaños por tramo
-while npel==False:
-  n_pel=input("¡cuantos peldaos tednra cada tramo?")
-  if n_pel=="0":
-    print("Debe haber al menos 1 peldaño por tramo")
-
-  elif n_pel=="1":
-  
-    npel=True
-
-  else: npel=True
-
-
-pelda=False #Si se aclaro la existencia o no de un peldaño en el descanso
-if descanso==True:
-  while pelda==False:
-    pel=input("¿Hay peldanos en el descanso?, responda si o no",)
-    if pel=="si":
-      peldanos=True
-      pelda=True
-    
-    elif pel=="no":
-      peldanos=False
-      pelda=True
-    
-    else: print("seleccione una opcion correcta")
-  
-nt=tramos
 
 #aqui lo que intentare sera que me cree las coordenadas de cada vertice en una vista frontal de las escaleras en diccionarios
-for i in range(tramos):
-  tram=0
-  x_in=0
-  z_in=0
-  def c_tram(tram,x_in,z_in):
-    if tram % 2 == 0:
-      x=x_in
-      z=z_in
-      for i in range(n_pel):
-        "peldano (i+(tram*n_pel))"=[ #aqui quiero hacer que el numero del peldano aumente +1 pero aun no se como xd
-          [x,z],
-          [x,z+ch]
-        ] 
-        x=x+hh
-        z=z+ch
+tram=0
+x_in=0
+z_in=0
+for i in range(num_tram):
+  
 
+  print("tramo actual = ",tram)
+
+  if tram % 2 == 0:
+    x=x_in
+    z=z_in
+    for i in range(num_pel):
+      pel=[
+        [round(x,1),round(z,1)],
+        [round(x,1),round(z+ch,1)]
+      ] 
+      print(pel)
+      x=x+hh
+      z=z+ch
+    
+    if des_pel==False:
+      des=[
+        [round(x,1),round(z,1)],
+        [round(x+l_desc,1),round(z,1)]
+
+      ]
     else:
-      x=x_in+(hh*n_pel)
-      z=z_in+(h/2)
-      for i in range(n_pel):
-        "peldano (i+(tram*n_pel))"=[ #aqui lo mismo
-          [x,z],
-          [x,z+ch]
-        ]
-        x=x-hh
-        z=z+ch
+      des=[
+        [round(x,1),round(z,1)],
+        [round(x+l_desc,1),round(z,1)]
+        [round(x,1),round(z+ch,1)],
+        [round(x+l_desc,1),round(z+ch,1)]
+
+      ]
+    print("descanso ")
+    print(des)
+
+  else:
+    if des_pel==False:
+      x=x_in+(hh*num_pel)
+      z=z_in
+    else:
+      x=x_in+(hh*num_pel)
+      z=z_in+ch
+
+    for i in range(num_pel):
+      pel=[ 
+        [round(x,1),round(z,1)],
+        [round(x,1),round(z+ch,1)]
+      ]
+      print(pel)
+      x=x-hh
+      z=z+ch
   tram=tram+1
+  z_in=z_in+(h/2)    
+  
+  print("tramo siguiente = ",tram)
