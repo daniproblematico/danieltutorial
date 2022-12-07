@@ -229,14 +229,11 @@ for i in range(niveles):
     # print("tramo siguiente = ", tram)
     # for tramo in data['tramos'].keys():
 # num_pel = sum([len(tramo['peldanos']) for tramo in data['tramos'].values()])
-
+# for i,cord in enumerate(tramo_0):
 
 blabla = 0
 xx = []
 zz = []
-
-# for i,cord in enumerate(tramo_0):
-
 
 for i in range(len(tramo_0)):
     tramox = tramo_0[blabla][0]
@@ -247,16 +244,13 @@ for i in range(len(tramo_0)):
 
     blabla = blabla + 1
 print(xx, zz)
-plt.plot(xx, zz)
+plt.scatter(xx, zz)
 plt.show()
-
 
 blabla = 0
 xx = []
 zz = []
 
-# # if data["generales"]["descanso_con_peldanos"]:
-# #   num_pel += 1
 for i in range(len(tramo_1)):
     tramox = tramo_1[blabla][0]
     xx.append(tramox)
@@ -266,5 +260,5 @@ for i in range(len(tramo_1)):
 
     blabla = blabla + 1
 print(xx, zz)
-plt.plot(xx, zz)
+plt.scatter(xx, zz)
 plt.show()
