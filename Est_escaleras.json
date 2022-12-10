@@ -52,7 +52,7 @@
         "1": {
             "apoyo_izq":{
                 "tipo": "viga",
-                "seccion": [0.20,0.40]
+                "seccion": [0.40,0.40]
             },
             "apoyo_der":{
                 "tipo": "muro_sobre_viga",
