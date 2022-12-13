@@ -16,14 +16,11 @@ def Graficar_tramo(tramo, apoyo_derecho, apoyo_izquierdo):
     xx = []
     zz = []
 
-    for i in range(len(tramo)):
-        tramox = tramo[blabla][0]
+    for tr in tramo:
+        tramox, tramoz = tr
         xx.append(tramox)
-
-        tramoz = tramo[blabla][1]
         zz.append(tramoz)
 
-        blabla = blabla + 1
     plt.plot(xx, zz)
 
     blabla = 0
@@ -58,17 +55,19 @@ def Graficar_tramo(tramo, apoyo_derecho, apoyo_izquierdo):
 
 keys = list(data["tramos"].keys())
 
+
 # calular contrahuella
+
+#TODO - Esto esta malito
 ch = data["generales"]["altura_piso"] / (
     len(data["tramos"][keys[0]]["peldanos"]) + len(data["tramos"][keys[1]]["peldanos"])
 )
 
 
-z_inicial = 0
 tramo = [[0, 0]]
 apoyo_derecho = []
 apoyo_izquierdo = []
-z = z_inicial
+z = 0
 
 # el rango es el numero de tramos
 for i in range(len(data["tramos"])):
@@ -87,7 +86,7 @@ for i in range(len(data["tramos"])):
     ):
         escalera_derecha = False
 
-    # el rango es el numero de peldanos del tramo
+    # el rango es el numero de peldanos del tramo, aqui genero los vertices de n peldaños
     for n in range(len(data["tramos"][keys[i]]["peldanos"])):
         z = z + ch
         k = data["tramos"][keys[i]]["peldanos"][peldanos[n]]["vertices"]
@@ -100,37 +99,51 @@ for i in range(len(data["tramos"])):
         # si la escalera sube hacia la izquierda
         else:
 
-            xxzz = [[k[1][0], ch+z], [k[0][0], ch+z]]
+            xxzz = [[k[1][0], ch + z], [k[0][0], ch + z]]
 
         tramo.extend(xxzz)
     print("primeros vertices ", tramo)
     print(tramo[-1][0])
+
+    # el orden de dibujado depende de si la escalera va hacia la izquierda o la derecha
     if escalera_derecha == True:
 
+        # genero los vertices del descanso en base a donde acabaron los peldaños
         des = [
             [tramo[-1][0], tramo[-1][1] + ch],
             [tramo[-1][0] + long_des, tramo[-1][1] + ch],
-            [tramo[-1][0] + long_des, tramo[-1][1]],
+            [
+                tramo[-1][0] + long_des,
+                tramo[-1][1] + ch - data["generales"]["espesor_losa"],
+            ],
         ]
-        inclinacion = np.arctan((tramo[2][0]) - (tramo[0][0])) / (
-            (tramo[2][1]) - (tramo[0][1])
-        )
-        
 
+        # calculo la inclunación de la losa para asegurar el ancho de losa
+        inclinacion = np.arctan((tramo[2][0]) - (tramo[0][0])) / ch
+
+        # calcula los vertices de la losa
         vertices_inferiores = [
             [
                 tramo[-1][0]
-                + round((data["generales"]["espesor_losa"] / (np.cos(inclinacion))), 2),
-                tramo[-1][1],
+                + np.tan(inclinacion) * (ch + data["generales"]["espesor_losa"]),
+                des[2][1],
             ],
             [
-                tramo[0][0]
-                + round((data["generales"]["espesor_losa"] / (np.cos(inclinacion))), 2),
+                tramo[0][0] + data["generales"]["espesor_losa"] / (np.cos(inclinacion)),
                 tramo[0][1],
             ],
-            [tramo[0][0], tramo[0][1]],
         ]
 
+        des2 = [
+            [
+                vertices_inferiores[1][0]
+                - (data["generales"]["espesor_losa"] * np.tan(inclinacion)),
+                tramo[0][1] - data["generales"]["espesor_losa"],
+            ],
+            [tramo[0][0] - long_des, tramo[0][1] - data["generales"]["espesor_losa"]],
+            [tramo[0][0] - long_des, tramo[0][1]],
+            [tramo[0][0], tramo[0][1]],
+        ]
 
         if data["tramos"][keys[i]]["apoyo_der"]["tipo"] == "muro_sobre_viga":
             apoyo_der1 = [[des[2][0], des[2][1]], [des[2][0], tramo[0][1]]]
@@ -155,6 +168,11 @@ for i in range(len(data["tramos"])):
                     tramo[0][1]
                     - data["tramos"][keys[i]]["apoyo_der"]["seccion_viga"][1],
                 ],
+                [
+                    apoyo_der1[0][0]
+                    - data["tramos"][keys[i]]["apoyo_der"]["espesor_muro"],
+                    tramo[0][1],
+                ],
             ]
 
             apoyo_der2 = [
@@ -166,8 +184,7 @@ for i in range(len(data["tramos"])):
                 [
                     apoyo_der1[0][0]
                     - data["tramos"][keys[i]]["apoyo_der"]["espesor_muro"],
-                    tramo[-1][1],
-                    
+                    des[2][1],
                 ],
                 [des[2][0], des[2][1]],
             ]
@@ -200,157 +217,257 @@ for i in range(len(data["tramos"])):
 
         if data["tramos"][keys[i]]["apoyo_izq"]["tipo"] == "viga":
             apoyo_izq = [
-                [vertices_inferiores[1][0], vertices_inferiores[1][1]],
+                [des2[1][0], des2[1][1]],
                 [
-                    vertices_inferiores[1][0],
-                    vertices_inferiores[1][1]
+                    des2[1][0],
+                    des2[1][1]
                     - data["tramos"][keys[i]]["apoyo_izq"]["seccion_viga"][1],
                 ],
                 [
-                    vertices_inferiores[1][0]
-                    - data["tramos"][keys[i]]["apoyo_izq"]["seccion_viga"][0],
-                    vertices_inferiores[1][1]
+                    des2[1][0]
+                    + data["tramos"][keys[i]]["apoyo_izq"]["seccion_viga"][0],
+                    des2[1][1]
                     - data["tramos"][keys[i]]["apoyo_izq"]["seccion_viga"][1],
                 ],
                 [
-                    vertices_inferiores[1][0]
-                    - data["tramos"][keys[i]]["apoyo_izq"]["seccion_viga"][0],
-                    vertices_inferiores[1][1],
+                    des2[1][0]
+                    + data["tramos"][keys[i]]["apoyo_izq"]["seccion_viga"][0],
+                    des2[1][1],
                 ],
-                [vertices_inferiores[1][0], vertices_inferiores[1][1]],
+                [des2[1][0], des2[1][1]],
             ]
             apoyo_izquierdo.extend(apoyo_izq)
-        #aun no esta listo :p
+
         if data["tramos"][keys[i]]["apoyo_izq"]["tipo"] == "muro_sobre_viga":
             apoyo_izq1 = [
-                [tramo[0][0], tramo[0][1]],
-                [tramo[0][0], tramo[0][1] - data["generales"]["altura_piso"]],
+                [des2[1][0], des2[1][1]],
+                [
+                    des2[1][0],
+                    des2[1][1] - (len(data["tramos"][keys[i - 1]]["peldanos"]) * ch),
+                ],
             ]
             viga_izq = [
-                [apoyo_izq1[0][1]
-                - data["tramos"][keys[i]]["apoyo_izq"]["seccion_viga"][0]
-                + data["generales"]["espesor_losa"],tramo[0][1] - data["generales"]["altura_piso"]],
-                [apoyo_izq1[0][1]
-                - data["tramos"][keys[i]]["apoyo_izq"]["seccion_viga"][0]
-                + data["generales"]["espesor_losa"],tramo[0][1],]
-
-            
+                [apoyo_izq1[0][0], apoyo_izq1[1][1]],
+                [
+                    apoyo_izq1[0][0],
+                    apoyo_izq1[1][1]
+                    - data["tramos"][keys[i]]["apoyo_izq"]["seccion_viga"][1],
+                ],
+                [
+                    apoyo_izq1[0][0]
+                    + data["tramos"][keys[i]]["apoyo_izq"]["seccion_viga"][0],
+                    apoyo_izq1[1][1]
+                    - data["tramos"][keys[i]]["apoyo_izq"]["seccion_viga"][1],
+                ],
+                [
+                    apoyo_izq1[0][0]
+                    + data["tramos"][keys[i]]["apoyo_izq"]["seccion_viga"][0],
+                    apoyo_izq1[1][1],
+                ],
             ]
 
             apoyo_izq2 = [
                 [
-                    tramo[0][0] + data["generales"]["espesor_losa"],
-                    tramo[0][1] - data["generales"]["altura_piso"],
+                    apoyo_izq1[0][0]
+                    + data["tramos"][keys[i]]["apoyo_izq"]["espesor_muro"],
+                    apoyo_izq1[1][1],
                 ],
-                [tramo[0][0] + data["generales"]["espesor_losa"], tramo[0][1]],
-                [tramo[0][0], tramo[0][1]],
+                [
+                    apoyo_izq1[0][0]
+                    + data["tramos"][keys[i]]["apoyo_izq"]["espesor_muro"],
+                    apoyo_izq1[0][1],
+                ],
             ]
             apoyo_izquierdo.extend(apoyo_izq1)
             apoyo_izquierdo.extend(viga_izq)
             apoyo_izquierdo.extend(apoyo_izq2)
 
-        
-    
+        tramo.extend(des)
+        tramo.extend(vertices_inferiores)
+        tramo.extend(des2)
+
     else:
 
         des = [
             [tramo[-1][0], tramo[-1][1] + ch],
             [tramo[-1][0] - long_des, tramo[-1][1] + ch],
-            [tramo[-1][0] - long_des, tramo[-1][1]],
+            [
+                tramo[-1][0] - long_des,
+                tramo[-1][1] + ch - data["generales"]["espesor_losa"],
+            ],
         ]
 
-        inclinacion = np.arctan((tramo[0][0]) - (tramo[2][0])) / (
-            (tramo[3][1]) - (tramo[0][1])
-        )
-
-        
+        inclinacion = np.arctan((tramo[0][0]) - (tramo[2][0])) / (ch)
 
         vertices_inferiores = [
             [
                 tramo[-1][0]
-                - round((data["generales"]["espesor_losa"] / (np.cos(inclinacion))), 2),
-                tramo[-1][1],
+                - np.tan(inclinacion) * (ch + data["generales"]["espesor_losa"]),
+                des[0][1] - data["generales"]["espesor_losa"],
             ],
             [
-                tramo[0][0]
-                - round((data["generales"]["espesor_losa"] / (np.cos(inclinacion))), 2),
+                tramo[0][0] - data["generales"]["espesor_losa"] / (np.cos(inclinacion)),
                 tramo[0][1],
             ],
-            [tramo[0][0],tramo[0][1]]
         ]
 
+        des2 = [
+            [
+                vertices_inferiores[1][0]
+                + (data["generales"]["espesor_losa"] * np.tan(inclinacion)),
+                tramo[0][1] - data["generales"]["espesor_losa"],
+            ],
+            [tramo[0][0] + long_des, tramo[0][1] - data["generales"]["espesor_losa"]],
+            [tramo[0][0] + long_des, tramo[0][1]],
+            [tramo[0][0], tramo[0][1]],
+        ]
+        tramo.extend(des)
+        tramo.extend(vertices_inferiores)
+        tramo.extend(des2)
 
         if data["tramos"][keys[i]]["apoyo_der"]["tipo"] == "muro_sobre_viga":
-            apoyo_der1 = [[tramo[-1][0] + long_des, tramo[0][1]],
-            
-            
+            apoyo_der1 = [
+                [des2[1][0], des2[1][1]],
+                [
+                    des2[1][0] - data["tramos"][keys[i]]["apoyo_der"]["espesor_muro"],
+                    des2[1][1],
+                ],
+                [
+                    des2[1][0] - data["tramos"][keys[i]]["apoyo_der"]["espesor_muro"],
+                    des2[1][1] - (len(data["tramos"][keys[i - 1]]["peldanos"]) * ch),
+                ],
             ]
 
             viga_der = [
+                [apoyo_der1[2][0], apoyo_der1[2][1]],
                 [
-                    apoyo_der1[0][0]
-                    - data["tramos"][keys[i]]["apoyo_der"]["seccion_viga"][0]
-                    + data["tramos"][keys[i]]["apoyo_der"]["espesor_muro"],
-                    tramo[0][1],
+                    apoyo_der1[2][0],
+                    apoyo_der1[2][1]
+                    - data["tramos"][keys[i]]["apoyo_der"]["seccion_viga"][1],
                 ],
                 [
-                    apoyo_der1[0][0]
-                    - data["tramos"][keys[i]]["apoyo_der"]["seccion_viga"][0]
-                    + data["tramos"][keys[i]]["apoyo_der"]["espesor_muro"],
-                    tramo[0][1] - data["tramos"][keys[i]]["apoyo_der"]["seccion_viga"][1],
+                    apoyo_der1[2][0]
+                    + data["tramos"][keys[i]]["apoyo_der"]["seccion_viga"][1],
+                    apoyo_der1[2][1]
+                    - data["tramos"][keys[i]]["apoyo_der"]["seccion_viga"][1],
                 ],
                 [
-                    apoyo_der1[0][0] + data["tramos"][keys[i]]["apoyo_der"]["espesor_muro"],
-                    tramo[0][1] - data["tramos"][keys[i]]["apoyo_der"]["seccion_viga"][1],
+                    apoyo_der1[2][0]
+                    + data["tramos"][keys[i]]["apoyo_der"]["seccion_viga"][1],
+                    apoyo_der1[2][1],
                 ],
             ]
 
             apoyo_der2 = [
                 [
-                    apoyo_der1[0][0] + data["tramos"][keys[i]]["apoyo_der"]["espesor_muro"],
-                    tramo[0][1],
+                    apoyo_der1[2][0]
+                    + data["tramos"][keys[i]]["apoyo_der"]["espesor_muro"],
+                    apoyo_der1[2][1],
                 ],
                 [
-                    apoyo_der1[0][0] + data["tramos"][keys[i]]["apoyo_der"]["espesor_muro"],
-                    tramo[-1][1],
+                    apoyo_der1[0][0],
+                    apoyo_der1[0][1],
                 ],
             ]
             apoyo_derecho.extend(apoyo_der1)
             apoyo_derecho.extend(viga_der)
             apoyo_derecho.extend(apoyo_der2)
 
-            
-        if data["tramos"][keys[i]]["apoyo_izq"]["tipo"] == "viga":    
+        if data["tramos"][keys[i]]["apoyo_der"]["tipo"] == "viga":
+            apoyo_der1 = [
+                [des2[2][0], des2[2][1]],
+                [
+                    des2[2][0]
+                    + data["tramos"][keys[i]]["apoyo_der"]["seccion_viga"][0],
+                    des2[2][1],
+                ],
+                [
+                    des2[2][0]
+                    + data["tramos"][keys[i]]["apoyo_der"]["seccion_viga"][0],
+                    des2[2][1]
+                    - data["tramos"][keys[i]]["apoyo_der"]["seccion_viga"][1],
+                ],
+                [
+                    des2[2][0],
+                    des2[2][1]
+                    - data["tramos"][keys[i]]["apoyo_der"]["seccion_viga"][1],
+                ],
+                [des2[2][0], des2[2][1]],
+            ]
+            apoyo_derecho.extend(apoyo_der1)
+
+        if data["tramos"][keys[i]]["apoyo_izq"]["tipo"] == "muro_sobre_viga":
+            apoyo_der1 = [
+                [
+                    des[2][0] + data["tramos"][keys[i]]["apoyo_der"]["espesor_muro"],
+                    des[2][1],
+                ],
+                [des[2][0], des[2][1]],
+                [
+                    des[2][0],
+                    des[2][1] - (len(data["tramos"][keys[i - 1]]["peldanos"]) * ch),
+                ],
+            ]
+
+            viga_der = [
+                [apoyo_der1[2][0], apoyo_der1[2][1]],
+                [
+                    apoyo_der1[2][0],
+                    apoyo_der1[2][1]
+                    - data["tramos"][keys[i]]["apoyo_der"]["seccion_viga"][1],
+                ],
+                [
+                    apoyo_der1[2][0]
+                    + data["tramos"][keys[i]]["apoyo_der"]["seccion_viga"][1],
+                    apoyo_der1[2][1]
+                    - data["tramos"][keys[i]]["apoyo_der"]["seccion_viga"][1],
+                ],
+                [
+                    apoyo_der1[2][0]
+                    + data["tramos"][keys[i]]["apoyo_der"]["seccion_viga"][1],
+                    apoyo_der1[2][1],
+                ],
+            ]
+
+            apoyo_der2 = [
+                [
+                    apoyo_der1[2][0]
+                    + data["tramos"][keys[i]]["apoyo_der"]["espesor_muro"],
+                    apoyo_der1[2][1],
+                ],
+                [
+                    apoyo_der1[0][0],
+                    apoyo_der1[0][1],
+                ],
+            ]
+            apoyo_izquierdo.extend(apoyo_der1)
+            apoyo_izquierdo.extend(viga_der)
+            apoyo_izquierdo.extend(apoyo_der2)
+
+        if data["tramos"][keys[i]]["apoyo_izq"]["tipo"] == "viga":
             apoyo_izq = [
+                [des[1][0], des[1][1]],
                 [
-                    vertices_inferiores[1][0],
-                    vertices_inferiores[1][1]
-                    - data["tramos"][keys[i]]["apoyo_izq"]["seccion_viga"][1],
+                    des[1][0] - data["tramos"][keys[i]]["apoyo_izq"]["seccion_viga"][0],
+                    des[1][1],
                 ],
                 [
-                    vertices_inferiores[1][0]
-                    + data["tramos"][keys[i]]["apoyo_izq"]["seccion_viga"][0],
-                    vertices_inferiores[1][1]
-                    - data["tramos"][keys[i]]["apoyo_izq"]["seccion_viga"][1],
+                    des[1][0] - data["tramos"][keys[i]]["apoyo_izq"]["seccion_viga"][0],
+                    des[1][1] - data["tramos"][keys[i]]["apoyo_izq"]["seccion_viga"][1],
                 ],
                 [
-                    vertices_inferiores[1][0]
-                    + data["tramos"][keys[i]]["apoyo_izq"]["seccion_viga"][0],
-                    vertices_inferiores[1][1],
+                    des[1][0],
+                    des[1][1] - data["tramos"][keys[i]]["apoyo_izq"]["seccion_viga"][1],
                 ],
-                [tramo[0][0], tramo[0][1]],
+                [des[1][0], des[1][1]],
             ]
             apoyo_izquierdo.extend(apoyo_izq)
-
-
-    tramo.extend(des)
-    tramo.extend(vertices_inferiores)
 
     print(tramo)
 
     Graficar_tramo(tramo, apoyo_derecho, apoyo_izquierdo)
 
     tramo = [[des[0][0], des[0][1]]]
-    apoyo_derecho=[]
-    apoyo_izquierdo=[]
+    apoyo_derecho = []
+    apoyo_izquierdo = []
     print(tramo)

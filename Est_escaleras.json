@@ -7,11 +7,12 @@
         "0": {
             "apoyo_izq":{
                 "tipo": "viga",
-                "seccion_viga": [0.40,0.40]
+                "seccion_viga": [0.60,0.60],
+                "espesor_muro": 0.15
             },
             "apoyo_der":{
-                "tipo": "muro_sobre_viga",
-                "seccion_viga": [0.40,0.40],
+                "tipo": "viga",
+                "seccion_viga": [0.60,0.60],
                 "espesor_muro": 0.15
             },
             "descanso": {
@@ -52,11 +53,11 @@
         "1": {
             "apoyo_izq":{
                 "tipo": "viga",
-                "seccion_viga": [0.40,0.40]
+                "seccion_viga": [0.60,0.60]
             },
             "apoyo_der":{
                 "tipo": "muro_sobre_viga",
-                "seccion_viga": [0.40,0.40],
+                "seccion_viga": [0.60,0.60],
                 "espesor_muro": 0.15
             },
             "descanso": {
