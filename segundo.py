@@ -11,12 +11,12 @@ with open("Est_escaleras.json", "r") as f:
     data = json.load(f)
 
 
-def Graficar_tramo(tramo, apoyo_derecho, apoyo_izquierdo):
+def Graficar_tramo(stairs, apoyo_derecho, apoyo_izquierdo):
     blabla = 0
     xx = []
     zz = []
 
-    for tr in tramo:
+    for tr in stairs:
         tramox, tramoz = tr
         xx.append(tramox)
         zz.append(tramoz)
@@ -64,7 +64,7 @@ ch = data["generales"]["altura_piso"] / (
 )
 
 
-tramo = [[0, 0]]
+stairs = [[0, 0]]
 apoyo_derecho = []
 apoyo_izquierdo = []
 z = 0
@@ -74,7 +74,7 @@ ziii = np.linspace(0, 2.5, 6)
 
 # el rango es el numero de tramos
 
-# for tramo in data['tramos'].values():
+# for stairs in data['tramos'].values():
 
 for i in range(len(data["tramos"])):
 
@@ -113,36 +113,36 @@ for i in range(len(data["tramos"])):
 
             xxzz = [[k[1][0], ch + z], [k[0][0], ch + z]]
 
-        tramo.extend(xxzz)
-    #print("primeros vertices ", tramo)
-    #print(tramo[-1][0])
+        stairs.extend(xxzz)
+    #print("primeros vertices ", stairs)
+    #print(stairs[-1][0])
 
     # el orden de dibujado depende de si la escalera va hacia la izquierda o la derecha
     if escalera_derecha == True:
 
         # genero los vertices del descanso en base a donde acabaron los peldaños
         des = [
-            [tramo[-1][0], tramo[-1][1] + ch],
-            [tramo[-1][0] + long_des, tramo[-1][1] + ch],
+            [stairs[-1][0], stairs[-1][1] + ch],
+            [stairs[-1][0] + long_des, stairs[-1][1] + ch],
             [
-                tramo[-1][0] + long_des,
-                tramo[-1][1] + ch - data["generales"]["espesor_losa"],
+                stairs[-1][0] + long_des,
+                stairs[-1][1] + ch - data["generales"]["espesor_losa"],
             ],
         ]
 
         # calculo la inclunación de la losa para asegurar el ancho de losa
-        inclinacion = np.arctan((tramo[2][0]) - (tramo[0][0])) / ch
+        inclinacion = np.arctan((stairs[2][0]) - (stairs[0][0])) / ch
 
         # calcula los vertices de la losa
         vertices_inferiores = [
             [
-                tramo[-1][0]
+                stairs[-1][0]
                 + np.tan(inclinacion) * (ch + data["generales"]["espesor_losa"]),
                 des[2][1],
             ],
             [
-                tramo[0][0] + data["generales"]["espesor_losa"] / (np.cos(inclinacion)),
-                tramo[0][1],
+                stairs[0][0] + data["generales"]["espesor_losa"] / (np.cos(inclinacion)),
+                stairs[0][1],
             ],
         ]
 
@@ -150,40 +150,40 @@ for i in range(len(data["tramos"])):
             [
                 vertices_inferiores[1][0]
                 - (data["generales"]["espesor_losa"] * np.tan(inclinacion)),
-                tramo[0][1] - data["generales"]["espesor_losa"],
+                stairs[0][1] - data["generales"]["espesor_losa"],
             ],
-            [tramo[0][0] - long_des, tramo[0][1] - data["generales"]["espesor_losa"]],
-            [tramo[0][0] - long_des, tramo[0][1]],
-            [tramo[0][0], tramo[0][1]],
+            [stairs[0][0] - long_des, stairs[0][1] - data["generales"]["espesor_losa"]],
+            [stairs[0][0] - long_des, stairs[0][1]],
+            [stairs[0][0], stairs[0][1]],
         ]
 
         if data["tramos"][keys[i]]["apoyo_der"]["tipo"] == "muro_sobre_viga":
-            apoyo_der1 = [[des[2][0], des[2][1]], [des[2][0], tramo[0][1]]]
+            apoyo_der1 = [[des[2][0], des[2][1]], [des[2][0], stairs[0][1]]]
 
             viga_der = [
                 [
                     apoyo_der1[0][0]
                     + data["tramos"][keys[i]]["apoyo_der"]["seccion_viga"][0]
                     - data["tramos"][keys[i]]["apoyo_der"]["espesor_muro"],
-                    tramo[0][1],
+                    stairs[0][1],
                 ],
                 [
                     apoyo_der1[0][0]
                     + data["tramos"][keys[i]]["apoyo_der"]["seccion_viga"][0]
                     - data["tramos"][keys[i]]["apoyo_der"]["espesor_muro"],
-                    tramo[0][1]
+                    stairs[0][1]
                     - data["tramos"][keys[i]]["apoyo_der"]["seccion_viga"][1],
                 ],
                 [
                     apoyo_der1[0][0]
                     - data["tramos"][keys[i]]["apoyo_der"]["espesor_muro"],
-                    tramo[0][1]
+                    stairs[0][1]
                     - data["tramos"][keys[i]]["apoyo_der"]["seccion_viga"][1],
                 ],
                 [
                     apoyo_der1[0][0]
                     - data["tramos"][keys[i]]["apoyo_der"]["espesor_muro"],
-                    tramo[0][1],
+                    stairs[0][1],
                 ],
             ]
 
@@ -191,7 +191,7 @@ for i in range(len(data["tramos"])):
                 [
                     apoyo_der1[0][0]
                     - data["tramos"][keys[i]]["apoyo_der"]["espesor_muro"],
-                    tramo[0][1],
+                    stairs[0][1],
                 ],
                 [
                     apoyo_der1[0][0]
@@ -294,32 +294,32 @@ for i in range(len(data["tramos"])):
             apoyo_izquierdo.extend(viga_izq)
             apoyo_izquierdo.extend(apoyo_izq2)
 
-        tramo.extend(des)
-        tramo.extend(vertices_inferiores)
-        tramo.extend(des2)
+        stairs.extend(des)
+        stairs.extend(vertices_inferiores)
+        stairs.extend(des2)
 
     else:
 
         des = [
-            [tramo[-1][0], tramo[-1][1] + ch],
-            [tramo[-1][0] - long_des, tramo[-1][1] + ch],
+            [stairs[-1][0], stairs[-1][1] + ch],
+            [stairs[-1][0] - long_des, stairs[-1][1] + ch],
             [
-                tramo[-1][0] - long_des,
-                tramo[-1][1] + ch - data["generales"]["espesor_losa"],
+                stairs[-1][0] - long_des,
+                stairs[-1][1] + ch - data["generales"]["espesor_losa"],
             ],
         ]
 
-        inclinacion = np.arctan((tramo[0][0]) - (tramo[2][0])) / (ch)
+        inclinacion = np.arctan((stairs[0][0]) - (stairs[2][0])) / (ch)
 
         vertices_inferiores = [
             [
-                tramo[-1][0]
+                stairs[-1][0]
                 - np.tan(inclinacion) * (ch + data["generales"]["espesor_losa"]),
                 des[0][1] - data["generales"]["espesor_losa"],
             ],
             [
-                tramo[0][0] - data["generales"]["espesor_losa"] / (np.cos(inclinacion)),
-                tramo[0][1],
+                stairs[0][0] - data["generales"]["espesor_losa"] / (np.cos(inclinacion)),
+                stairs[0][1],
             ],
         ]
 
@@ -327,15 +327,15 @@ for i in range(len(data["tramos"])):
             [
                 vertices_inferiores[1][0]
                 + (data["generales"]["espesor_losa"] * np.tan(inclinacion)),
-                tramo[0][1] - data["generales"]["espesor_losa"],
+                stairs[0][1] - data["generales"]["espesor_losa"],
             ],
-            [tramo[0][0] + long_des, tramo[0][1] - data["generales"]["espesor_losa"]],
-            [tramo[0][0] + long_des, tramo[0][1]],
-            [tramo[0][0], tramo[0][1]],
+            [stairs[0][0] + long_des, stairs[0][1] - data["generales"]["espesor_losa"]],
+            [stairs[0][0] + long_des, stairs[0][1]],
+            [stairs[0][0], stairs[0][1]],
         ]
-        tramo.extend(des)
-        tramo.extend(vertices_inferiores)
-        tramo.extend(des2)
+        stairs.extend(des)
+        stairs.extend(vertices_inferiores)
+        stairs.extend(des2)
 
         if data["tramos"][keys[i]]["apoyo_der"]["tipo"] == "muro_sobre_viga":
             apoyo_der1 = [
@@ -475,12 +475,12 @@ for i in range(len(data["tramos"])):
             ]
             apoyo_izquierdo.extend(apoyo_izq)
 
-    #print(tramo)
-    p=np.array(tramo)
+    #print(stairs)
+    p=np.array(stairs)
     print(p[:,0])
-    #Graficar_tramo(tramo, apoyo_derecho, apoyo_izquierdo)
+    Graficar_tramo(stairs, apoyo_derecho, apoyo_izquierdo)
 
-    tramo = [[des[0][0], des[0][1]]]
+    stairs = [[des[0][0], des[0][1]]]
     apoyo_derecho = []
     apoyo_izquierdo = []
 
