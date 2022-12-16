@@ -69,9 +69,20 @@ apoyo_derecho = []
 apoyo_izquierdo = []
 z = 0
 
+ziii = np.linspace(0, 2.5, 6)
+#print(ziii)
+
 # el rango es el numero de tramos
+
+# for tramo in data['tramos'].values():
+
 for i in range(len(data["tramos"])):
 
+    ch = data["generales"]["altura_piso"] / (
+    len(data["tramos"][keys[0]]["peldanos"]) + len(data["tramos"][keys[1]]["peldanos"])
+    )
+
+    
     peldanos = list(data["tramos"][keys[i]]["peldanos"].keys())
     escalera_derecha = True
     long_des = (
@@ -86,6 +97,7 @@ for i in range(len(data["tramos"])):
     ):
         escalera_derecha = False
 
+    # TODO - for innecsario
     # el rango es el numero de peldanos del tramo, aqui genero los vertices de n peldaños
     for n in range(len(data["tramos"][keys[i]]["peldanos"])):
         z = z + ch
@@ -102,8 +114,8 @@ for i in range(len(data["tramos"])):
             xxzz = [[k[1][0], ch + z], [k[0][0], ch + z]]
 
         tramo.extend(xxzz)
-    print("primeros vertices ", tramo)
-    print(tramo[-1][0])
+    #print("primeros vertices ", tramo)
+    #print(tramo[-1][0])
 
     # el orden de dibujado depende de si la escalera va hacia la izquierda o la derecha
     if escalera_derecha == True:
@@ -463,11 +475,13 @@ for i in range(len(data["tramos"])):
             ]
             apoyo_izquierdo.extend(apoyo_izq)
 
-    print(tramo)
-
-    Graficar_tramo(tramo, apoyo_derecho, apoyo_izquierdo)
+    #print(tramo)
+    p=np.array(tramo)
+    print(p[:,0])
+    #Graficar_tramo(tramo, apoyo_derecho, apoyo_izquierdo)
 
     tramo = [[des[0][0], des[0][1]]]
     apoyo_derecho = []
     apoyo_izquierdo = []
-    print(tramo)
+
+    
