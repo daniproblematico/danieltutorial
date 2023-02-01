@@ -8,11 +8,11 @@ with open("Est_escaleras.json", "r") as f:
     data = json.load(f)
 
 
-keys=data['tramos'].keys()
+ziii = np.linspace(0, 2.5, 6)
+#print(ziii)
 
-for i in keys:
-    print("tramo ",data["tramos"][i]["peldanos"])
-    num_pel = len(data["tramos"][i]["peldanos"]) + len(
-    data["tramos"][keys[i+1]]["peldanos"]
-    )
-    print(num_pel)
+p=data['tramos'].values()
+
+
+for tramos in data['tramos'].values():
+    print(tramos['apoyo_izq']["tipo"])
